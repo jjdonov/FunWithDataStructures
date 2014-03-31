@@ -57,6 +57,7 @@ public class PeekingIteratorImplTest {
 				testList);
 		int i = 0;
 		while (pItr.hasNext()) {
+			pItr.next();
 			if (i < testList.size() - 1) {
 				Integer j = pItr.peekAhead();
 				assertEquals(j, testData[i + 1]);
