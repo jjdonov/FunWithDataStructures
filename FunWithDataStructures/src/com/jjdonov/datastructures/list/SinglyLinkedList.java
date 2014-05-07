@@ -19,6 +19,11 @@ public class SinglyLinkedList<E> implements Iterable<E> {
 	public SinglyLinkedList() {
 		size = 0;
 	}
+	
+	public SinglyLinkedList(E[] all) {
+		size = 0;
+		insertAll(all);
+	}
 
 	/**
 	 * Insert element to the head of the list
@@ -136,7 +141,7 @@ public class SinglyLinkedList<E> implements Iterable<E> {
 			sb.append(e.element.toString()).append(", ");
 			e = e.next;
 		}
-		return sb.substring(0, sb.length() - 2);
+		return sb.length() > 0 ? sb.substring(0, sb.length() - 2) : "";
 	}
 
 	@Override
@@ -146,35 +151,58 @@ public class SinglyLinkedList<E> implements Iterable<E> {
 
 	private class SinglyLinkedListIterator implements Iterator<E> {
 
-		private Node<E> nextNode;
+		private Node<E> currentNode;
 		private Node<E> previousNode;
+		private E lastRet;
+		private boolean started;
 
 		public SinglyLinkedListIterator() {
-			nextNode = head;
+			currentNode = null;
 			previousNode = null;
+			lastRet = null;
 		}
 
 		@Override
 		public boolean hasNext() {
-			if (nextNode == null || nextNode.next == null)
-				return false;
-			return true;
+			if (!started) {
+				return head != null;
+			} else {
+				return currentNode.next != null;
+			}
 		}
 
 		@Override
 		public E next() {
-			if (!hasNext())
-				throw new NoSuchElementException();
-			previousNode = nextNode;
-			nextNode = nextNode.next;
-			return previousNode.element;
+			if(!started) {
+				currentNode = head;
+				started = true;
+			} else {
+				if (!hasNext())
+					throw new NoSuchElementException();
+				if(lastRet != null) {
+					previousNode = currentNode;
+				}
+				currentNode = currentNode.next;
+			}
+			return lastRet = currentNode.element;
 		}
 
 		@Override
 		public void remove() {
-			if (previousNode == null)
+			if (currentNode == null)
 				throw new NoSuchElementException();
-			previousNode.next = nextNode.next;
+			if(currentNode == head) {
+				head = currentNode.next;
+				previousNode = null;
+			}
+			else if(currentNode == tail) {
+				previousNode.next = null;
+				tail = previousNode;
+			}
+			else {
+				previousNode.next = currentNode.next;
+			}
+			lastRet = null;
 			size--;
 		}
 	}
@@ -185,13 +213,34 @@ public class SinglyLinkedList<E> implements Iterable<E> {
 	 *
 	 * @param <E>
 	 */
-	private static class Node<E> {
+	public static class Node<E> {
 		E element;
 		Node<E> next;
 
 		Node(E element, Node<E> next) {
 			this.element = element;
 			this.next = next;
+		}
+		
+		public E getElement() {
+			return element;
+		}
+		
+		public void setElement(E element) {
+			this.element = element; 
+		}
+		
+		public Node<E> getNext() {
+			return next;
+		}
+		
+		public void setNext(Node<E> next) {
+			this.next = next;
+		}
+		
+		@Override
+		public String toString() {
+			return element.toString();
 		}
 	}
 }
